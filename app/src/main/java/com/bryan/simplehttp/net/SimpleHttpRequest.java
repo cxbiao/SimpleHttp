@@ -72,6 +72,11 @@ public abstract  class SimpleHttpRequest {
         private String destFileName;
         private int timeOut;
 
+        //for post
+        private String content;
+        private byte[] bytes;
+        private File file;
+
 
         public Builder url(String url)
         {
@@ -105,6 +110,21 @@ public abstract  class SimpleHttpRequest {
             return  this;
         }
 
+        public Builder content(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public Builder file(File file) {
+            this.file = file;
+            return this;
+        }
+
+        public Builder bytes(byte[] bytes){
+            this.bytes=bytes;
+            return  this;
+        }
+
         public SimpleHttpRequest get(RequestCallback callBack){
             SimpleGetHttpRequest request=new SimpleGetHttpRequest(url,params,callBack);
             request.timeOut=timeOut<=0?3000:timeOut;
@@ -113,7 +133,7 @@ public abstract  class SimpleHttpRequest {
         }
 
         public SimpleHttpRequest post(RequestCallback callBack){
-            SimplePostHttpRequest request=new SimplePostHttpRequest(url,params,callBack);
+            SimplePostHttpRequest request=new SimplePostHttpRequest(url,params,content,bytes,file,callBack);
             request.timeOut=timeOut<=0?3000:timeOut;
             request.asynExecute();
             return  request;

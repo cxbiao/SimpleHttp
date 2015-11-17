@@ -4,10 +4,8 @@ import android.util.Pair;
 
 import com.bryan.simplehttp.net.callback.RequestCallback;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.FileNameMap;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,7 +29,7 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
     private DataOutputStream dos;
 
     public SimpleUploadRequest(String url, Map<String, String> params, Pair<String, File>[] files, RequestCallback callBack) {
-        super(url, params, callBack);
+        super(url, params, null,null,null,callBack);
         this.files = files;
     }
 
@@ -79,6 +77,9 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
     //普通字符串数据
     private void writeStringParams() throws Exception {
 
+        if(params==null || params.isEmpty()){
+            return;
+        }
         Set<String> keySet = params.keySet();
         for (Iterator<String> it = keySet.iterator(); it.hasNext(); ) {
             String name = it.next();
@@ -120,24 +121,7 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
         dos.writeBytes("\r\n");
     }
 
-    //把文件转换成字节数组
-    private byte[] getFileBytes(File f) throws Exception {
-        long flength=f.length();
-        sendProgress(flength,0,true);
-        FileInputStream in = new FileInputStream(f);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf= new byte[1024];
-        int len;
-        long current=0;
-        while ((len = in.read(buf)) != -1) {
-            current+=len;
-            out.write(buf, 0, len);
-            sendProgress(flength,current,true);
-        }
-        in.close();
-        out.close();
-        return out.toByteArray();
-    }
+
 
 
     private String guessMimeType(String path) {
