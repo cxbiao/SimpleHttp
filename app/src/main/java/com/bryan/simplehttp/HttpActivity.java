@@ -13,6 +13,7 @@ import com.bryan.simplehttp.model.Course;
 import com.bryan.simplehttp.model.Person;
 import com.bryan.simplehttp.net.SimpleHttpRequest;
 import com.bryan.simplehttp.net.callback.RequestCallback;
+import com.bryan.simplehttp.net.callback.SimpleType;
 
 import java.io.File;
 import java.util.HashMap;
@@ -88,13 +89,24 @@ public class HttpActivity extends AppCompatActivity {
 
     public void post(View v) {
 
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("username", "qq");
         params.put("password", "说明");
-        new SimpleHttpRequest.Builder()
-                .url("http://192.168.6.59:8080/web/LoginServlet")
+//        new SimpleHttpRequest.Builder()
+//                .url("http://192.168.6.59:8080/web/LoginServlet")
+//                .params(params)
+//                .post(myCallBack);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+               String result= new SimpleHttpRequest.Builder()
+                 .url("http://192.168.6.59:8080/web/LoginServlet")
                 .params(params)
-                .post(myCallBack);
+                .postSync(new SimpleType<String>(){});
+                Log.d(TAG,result);
+            }
+        }).start();
     }
 
 
@@ -103,21 +115,54 @@ public class HttpActivity extends AppCompatActivity {
                 .url("https://kyfw.12306.cn/otn/")
                 .get(myCallBack);
 
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                String result=new SimpleHttpRequest.Builder()
+//                        .url("http://www.baidu.com")
+//                        .getSync(String.class);
+//                Log.d(TAG, result);
+//            }
+//        }).start();
+
     }
 
     public void getPerson(View v){
         new SimpleHttpRequest.Builder()
                 .url("http://192.168.6.59:8080/web/json.txt")
                 .get(model1CallBack);
+
+//
+//                new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//               Person p=new SimpleHttpRequest.Builder()
+//                        .url("http://192.168.6.59:8080/web/json.txt")
+//                        .getSync(new SimpleType<Person>(){});
+//                Log.d(TAG,p.toString());
+//            }
+//        }).start();
     }
 
     public void getCourse(View v){
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
         params.put("format", "json");
-        new SimpleHttpRequest.Builder()
-                .url("http://192.168.6.59:8080/web/ListServlet")
-                .params(params)
-                .get(model2CallBack);
+//        new SimpleHttpRequest.Builder()
+//                .url("http://192.168.6.59:8080/web/ListServlet")
+//                .params(params)
+//                .get(model2CallBack);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Course> courses=new SimpleHttpRequest.Builder()
+                        .url("http://192.168.6.59:8080/web/ListServlet")
+                        .params(params)
+                        .getSync(new SimpleType<List<Course>>(){});
+                Log.d(TAG,courses.get(0).toString());
+            }
+        }).start();
     }
 
     public void download(View v){

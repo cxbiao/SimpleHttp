@@ -3,14 +3,17 @@
 package com.bryan.simplehttp.net;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 
 import com.alibaba.fastjson.JSON;
 import com.bryan.simplehttp.net.callback.RequestCallback;
+import com.bryan.simplehttp.net.callback.SimpleType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -45,7 +48,7 @@ public abstract  class SimpleHttpRequest {
     protected String url;
     protected Map<String, String> params;
     protected RequestCallback callBack;
-    private Handler mHandler=new Handler();
+    private Handler mHandler=new Handler(Looper.getMainLooper());
     protected  int timeOut=3000;
     protected  String charset="UTF-8";
     protected HttpURLConnection conn;
@@ -125,6 +128,11 @@ public abstract  class SimpleHttpRequest {
             return  this;
         }
 
+        /**
+         * 异步get请求
+         * @param callBack
+         * @return
+         */
         public SimpleHttpRequest get(RequestCallback callBack){
             SimpleGetHttpRequest request=new SimpleGetHttpRequest(url,params,callBack);
             request.timeOut=timeOut<=0?3000:timeOut;
@@ -132,6 +140,23 @@ public abstract  class SimpleHttpRequest {
             return  request;
         }
 
+        /**
+         * 同步get请求
+         * @param resultType
+         * @param <T>
+         * @return
+         */
+        public <T>T getSync(SimpleType<T> resultType){
+            SimpleGetHttpRequest request=new SimpleGetHttpRequest(url,params,null);
+            request.timeOut=timeOut<=0?3000:timeOut;
+            return request.syncExecute(resultType);
+        }
+
+        /**
+         * 异步post请求
+         * @param callBack
+         * @return
+         */
         public SimpleHttpRequest post(RequestCallback callBack){
             SimplePostHttpRequest request=new SimplePostHttpRequest(url,params,content,bytes,file,callBack);
             request.timeOut=timeOut<=0?3000:timeOut;
@@ -139,6 +164,23 @@ public abstract  class SimpleHttpRequest {
             return  request;
         }
 
+        /**
+         * 同步post请求
+         * @param resultType
+         * @param <T>
+         * @return
+         */
+        public <T>T postSync(SimpleType<T> resultType){
+            SimplePostHttpRequest request=new SimplePostHttpRequest(url,params,content,bytes,file,null);
+            request.timeOut=timeOut<=0?3000:timeOut;
+            return request.syncExecute(resultType);
+        }
+
+        /**
+         * 文件下载
+         * @param callBack
+         * @return
+         */
         public SimpleHttpRequest download(RequestCallback callBack){
             SimpleDownloadRequest request=new SimpleDownloadRequest(url,params,callBack,destFileName,destFileDir);
             request.timeOut=timeOut<=0?3000:timeOut;
@@ -146,6 +188,11 @@ public abstract  class SimpleHttpRequest {
             return  request;
         }
 
+        /**
+         * 文传上传
+         * @param callBack
+         * @return
+         */
         public SimpleHttpRequest upload(RequestCallback callBack){
             SimpleUploadRequest request=new SimpleUploadRequest(url,params,files,callBack);
             request.timeOut=timeOut<=0?3000:timeOut;
@@ -164,6 +211,20 @@ public abstract  class SimpleHttpRequest {
         taskExecutor.execute(runnable);
     }
 
+
+    protected <T>T syncExecute(SimpleType<T> resultType){
+        try {
+            initConnection();
+            buildRequestBody();
+            if(conn.getResponseCode()>400 && conn.getResponseCode()<599){
+                throw new RuntimeException(conn.getResponseCode()+" "+conn.getResponseMessage());
+            }
+            return execute(resultType);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Runnable runnable=new Runnable() {
         @Override
         public void run() {
@@ -173,7 +234,7 @@ public abstract  class SimpleHttpRequest {
                 if(conn.getResponseCode()>400 && conn.getResponseCode()<599){
                     throw new RuntimeException(conn.getResponseCode()+" "+conn.getResponseMessage());
                 }
-                execute();
+                execute(null);
             } catch (Exception e) {
                 sendError(e);
             }
@@ -229,7 +290,7 @@ public abstract  class SimpleHttpRequest {
         return sb.toString();
     }
 
-    protected  void execute() throws Exception{
+    protected  <T>T execute(SimpleType<T> resultType) throws Exception{
         InputStream is = conn.getInputStream();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -241,12 +302,20 @@ public abstract  class SimpleHttpRequest {
         is.close();
         conn.disconnect();
         String body = new String(baos.toByteArray(), charset);
-        if (callBack.mType == String.class) {
-            sendSuccess(body);
+        Type type=(callBack==null)?resultType.getType():callBack.mType;
+        if (type == String.class) {
+            if(resultType!=null) return (T)body;
+            else {
+                sendSuccess(body);
+            }
         } else {
-            Object object = JSON.parseObject(body, callBack.mType);
-            sendSuccess(object);
+            Object object = JSON.parseObject(body, type);
+            if(resultType!=null) return  (T)object;
+            else {
+                sendSuccess(object);
+            }
         }
+        return null;
     }
 
 

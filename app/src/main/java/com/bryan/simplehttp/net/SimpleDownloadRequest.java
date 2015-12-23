@@ -2,6 +2,7 @@ package com.bryan.simplehttp.net;
 
 
 import com.bryan.simplehttp.net.callback.RequestCallback;
+import com.bryan.simplehttp.net.callback.SimpleType;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,7 +21,7 @@ public class SimpleDownloadRequest  extends  SimpleGetHttpRequest{
     }
 
     @Override
-    protected void execute() throws Exception {
+    protected  <T>T execute(SimpleType<T> resultType) throws Exception {
         InputStream is = conn.getInputStream();
         File desFile=new File(destFileDir);
         if(!desFile.exists()){
@@ -41,6 +42,7 @@ public class SimpleDownloadRequest  extends  SimpleGetHttpRequest{
         is.close();
         conn.disconnect();
         sendSuccess("200 OK");
+        return null;
 
     }
 }
