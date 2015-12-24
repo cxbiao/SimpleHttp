@@ -1,4 +1,4 @@
-package com.bryan.simplehttp.model;
+package com.bryan.httpdemo.model;
 
 /**
  * Created by Administrator on 2015/11/13.

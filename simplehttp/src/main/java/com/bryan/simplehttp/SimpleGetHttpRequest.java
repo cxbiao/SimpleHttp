@@ -1,8 +1,8 @@
-package com.bryan.simplehttp.net;
+package com.bryan.simplehttp;
 
 import android.text.TextUtils;
 
-import com.bryan.simplehttp.net.callback.RequestCallback;
+import com.bryan.simplehttp.callback.RequestCallback;
 
 import java.net.HttpURLConnection;
 import java.net.URL;

@@ -1,8 +1,8 @@
-package com.bryan.simplehttp.net;
+package com.bryan.simplehttp;
 
 import android.util.Pair;
 
-import com.bryan.simplehttp.net.callback.RequestCallback;
+import com.bryan.simplehttp.callback.RequestCallback;
 
 import java.io.DataOutputStream;
 import java.io.File;

@@ -1,8 +1,8 @@
-package com.bryan.simplehttp.net;
+package com.bryan.simplehttp;
 
 
-import com.bryan.simplehttp.net.callback.RequestCallback;
-import com.bryan.simplehttp.net.callback.SimpleType;
+import com.bryan.simplehttp.callback.RequestCallback;
+import com.bryan.simplehttp.callback.SimpleType;
 
 import java.io.File;
 import java.io.FileOutputStream;

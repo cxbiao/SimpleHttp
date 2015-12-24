@@ -1,14 +1,14 @@
 
 
-package com.bryan.simplehttp.net;
+package com.bryan.simplehttp;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Pair;
 
 import com.alibaba.fastjson.JSON;
-import com.bryan.simplehttp.net.callback.RequestCallback;
-import com.bryan.simplehttp.net.callback.SimpleType;
+import com.bryan.simplehttp.callback.RequestCallback;
+import com.bryan.simplehttp.callback.SimpleType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

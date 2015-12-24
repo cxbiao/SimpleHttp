@@ -1,4 +1,4 @@
-package com.bryan.simplehttp;
+package com.bryan.httpdemo;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -9,11 +9,11 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
 
-import com.bryan.simplehttp.model.Course;
-import com.bryan.simplehttp.model.Person;
-import com.bryan.simplehttp.net.SimpleHttpRequest;
-import com.bryan.simplehttp.net.callback.RequestCallback;
-import com.bryan.simplehttp.net.callback.SimpleType;
+import com.bryan.httpdemo.model.Course;
+import com.bryan.httpdemo.model.Person;
+import com.bryan.simplehttp.SimpleHttpRequest;
+import com.bryan.simplehttp.callback.RequestCallback;
+import com.bryan.simplehttp.callback.SimpleType;
 
 import java.io.File;
 import java.util.HashMap;
@@ -121,7 +121,7 @@ public class HttpActivity extends AppCompatActivity {
                 .url("https://kyfw.12306.cn/otn/")
                 .get(myCallBack);
 
-        request.cancel();
+        //request.cancel();
 //        new Thread(new Runnable() {
 //            @Override
 //            public void run() {

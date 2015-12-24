@@ -1,4 +1,4 @@
-package com.bryan.simplehttp.net.callback;
+package com.bryan.simplehttp.callback;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

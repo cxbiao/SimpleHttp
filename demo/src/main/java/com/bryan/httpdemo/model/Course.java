@@ -1,4 +1,4 @@
-package com.bryan.simplehttp.model;
+package com.bryan.httpdemo.model;
 
 import java.io.Serializable;
 
