@@ -31,6 +31,8 @@ public abstract  class RequestCallback<T> {
 
     }
 
+    public void onCancel(){}
+
     public  abstract void onError(Exception e);
 
 

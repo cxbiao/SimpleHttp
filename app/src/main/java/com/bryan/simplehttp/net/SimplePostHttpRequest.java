@@ -100,6 +100,7 @@ public class SimplePostHttpRequest extends SimpleHttpRequest {
         conn.setDoOutput(true);
         conn.setUseCaches(false);
         conn.setConnectTimeout(timeOut);
+        conn.setReadTimeout(timeOut);
         conn.setRequestMethod("POST");
 
 

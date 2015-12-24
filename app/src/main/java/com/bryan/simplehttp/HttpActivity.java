@@ -45,6 +45,12 @@ public class HttpActivity extends AppCompatActivity {
         public void onProgress(long total, long current, boolean isUploading) {
             Log.d(TAG,"total:"+total+",current:"+current+",isUploading:"+isUploading);
         }
+
+        @Override
+        public void onCancel() {
+            webContent.setText("onCancel");
+            Log.d(TAG, "onCancel");
+        }
     };
 
     RequestCallback<Person> model1CallBack=new RequestCallback<Person>() {
@@ -59,6 +65,7 @@ public class HttpActivity extends AppCompatActivity {
             webContent.setText(Html.fromHtml(e.getMessage()));
             Log.e(TAG, e.getMessage());
         }
+
     };
 
     RequestCallback<List<Course>> model2CallBack=new RequestCallback<List<Course>>() {
@@ -109,13 +116,12 @@ public class HttpActivity extends AppCompatActivity {
         }).start();
     }
 
-
     public void get(View v){
-        new SimpleHttpRequest.Builder()
+        SimpleHttpRequest request=new SimpleHttpRequest.Builder()
                 .url("https://kyfw.12306.cn/otn/")
                 .get(myCallBack);
 
-
+        request.cancel();
 //        new Thread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -166,11 +172,21 @@ public class HttpActivity extends AppCompatActivity {
     }
 
     public void download(View v){
-        new SimpleHttpRequest.Builder()
+        final SimpleHttpRequest request=new SimpleHttpRequest.Builder()
                 .url("http://192.168.6.59:8080/web/files/abc.apk")
                 .destFileDir(Environment.getExternalStorageDirectory()+"/okhttp")
                 .destFileName("abc中国.apk")
                 .download(myCallBack);
+
+
+        //取消请求
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        request.cancel();
+
     }
 
     public void upload(View v){

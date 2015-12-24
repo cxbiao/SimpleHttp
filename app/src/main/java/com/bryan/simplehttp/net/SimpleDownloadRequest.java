@@ -34,6 +34,10 @@ public class SimpleDownloadRequest  extends  SimpleGetHttpRequest{
         int len;
         long current=0;
         while ((len= is.read(buf)) != -1) {
+            if(isCancel) {
+                sendCancel();
+                return null;
+            }
             current+=len;
             fos.write(buf, 0, len);
             sendProgress(flength,current,false);

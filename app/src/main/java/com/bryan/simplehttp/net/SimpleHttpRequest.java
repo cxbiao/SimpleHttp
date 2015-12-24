@@ -52,7 +52,7 @@ public abstract  class SimpleHttpRequest {
     protected  int timeOut=3000;
     protected  String charset="UTF-8";
     protected HttpURLConnection conn;
-
+    protected boolean isCancel;
 
 
 
@@ -189,7 +189,7 @@ public abstract  class SimpleHttpRequest {
         }
 
         /**
-         * 文传上传
+         * 异步文传上传
          * @param callBack
          * @return
          */
@@ -198,6 +198,18 @@ public abstract  class SimpleHttpRequest {
             request.timeOut=timeOut<=0?3000:timeOut;
             request.asynExecute();
             return  request;
+        }
+
+        /**
+         * 同步文传上传
+         * @param resultType
+         * @param <T>
+         * @return
+         */
+        public <T>T uploadSync(SimpleType<T> resultType){
+            SimpleUploadRequest request=new SimpleUploadRequest(url,params,files,null);
+            request.timeOut=timeOut<=0?3000:timeOut;
+            return  request.syncExecute(resultType);
         }
 
 
@@ -214,8 +226,20 @@ public abstract  class SimpleHttpRequest {
 
     protected <T>T syncExecute(SimpleType<T> resultType){
         try {
+            if(isCancel) {
+                sendCancel();
+                return null;
+            }
             initConnection();
+            if(isCancel) {
+                sendCancel();
+                return null;
+            }
             buildRequestBody();
+            if(isCancel) {
+                sendCancel();
+                return null;
+            }
             if(conn.getResponseCode()>400 && conn.getResponseCode()<599){
                 throw new RuntimeException(conn.getResponseCode()+" "+conn.getResponseMessage());
             }
@@ -229,10 +253,22 @@ public abstract  class SimpleHttpRequest {
         @Override
         public void run() {
             try {
+                if(isCancel) {
+                    sendCancel();
+                    return;
+                }
                 initConnection();
+                if(isCancel) {
+                    sendCancel();
+                    return;
+                }
                 buildRequestBody();
                 if(conn.getResponseCode()>400 && conn.getResponseCode()<599){
                     throw new RuntimeException(conn.getResponseCode()+" "+conn.getResponseMessage());
+                }
+                if(isCancel) {
+                    sendCancel();
+                    return;
                 }
                 execute(null);
             } catch (Exception e) {
@@ -251,6 +287,17 @@ public abstract  class SimpleHttpRequest {
             }
         });
     }
+
+    protected  void sendCancel(){
+        if(callBack==null) return;
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callBack.onCancel();
+            }
+        });
+    }
+
     protected  void sendSuccess(final Object obj){
         if(callBack==null) return;
         mHandler.post(new Runnable() {
@@ -296,6 +343,10 @@ public abstract  class SimpleHttpRequest {
         byte[] buffer = new byte[1024];
         int length;
         while ((length = is.read(buffer)) != -1) {
+            if(isCancel) {
+                sendCancel();
+                return null;
+            }
             baos.write(buffer, 0, length);
         }
         baos.close();
@@ -316,6 +367,11 @@ public abstract  class SimpleHttpRequest {
             }
         }
         return null;
+    }
+
+
+    public void cancel(){
+        isCancel=true;
     }
 
 

@@ -59,6 +59,7 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
         conn.setDoOutput(true);
         conn.setUseCaches(false);
         conn.setConnectTimeout(timeOut);
+        conn.setReadTimeout(timeOut);
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 

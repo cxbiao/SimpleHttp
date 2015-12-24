@@ -47,6 +47,7 @@ public class SimpleGetHttpRequest  extends  SimpleHttpRequest{
         }
         conn.setUseCaches(false);
         conn.setConnectTimeout(timeOut);
+        conn.setReadTimeout(timeOut);
         conn.setRequestMethod("GET");
     }
 
