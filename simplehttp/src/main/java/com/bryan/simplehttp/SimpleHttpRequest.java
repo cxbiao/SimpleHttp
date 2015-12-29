@@ -29,11 +29,11 @@ import javax.net.ssl.X509TrustManager;
  * 简单封装Http的操作，不使用第三方类库
  * 支持https
  * 模型解析使用了FastJson，也可以不用
- *
+ * <p/>
  * Authro：Cxb
  */
 
-public abstract  class SimpleHttpRequest {
+public abstract class SimpleHttpRequest {
 
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
@@ -41,29 +41,28 @@ public abstract  class SimpleHttpRequest {
     private static final int KEEP_ALIVE = 1;
     private static final BlockingQueue<Runnable> sPoolWorkQueue =
             new LinkedBlockingQueue<Runnable>(128);
-    public  static Executor taskExecutor=new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+    public static Executor taskExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
             TimeUnit.SECONDS, sPoolWorkQueue);
 
 
     protected String url;
     protected Map<String, String> params;
     protected RequestCallback callBack;
-    private Handler mHandler=new Handler(Looper.getMainLooper());
-    protected  int timeOut=3000;
-    protected  String charset="UTF-8";
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+    protected int timeOut = 3000;
+    protected String charset = "UTF-8";
     protected HttpURLConnection conn;
     protected boolean isCancel;
 
 
-
-    public SimpleHttpRequest(String url,Map<String, String> params,RequestCallback callBack){
-        this.url=url;
-        this.params=params;
-        this.callBack=callBack;
+    public SimpleHttpRequest(String url, Map<String, String> params, RequestCallback callBack) {
+        this.url = url;
+        this.params = params;
+        this.callBack = callBack;
     }
 
-    public Handler getHandler(){
-        return  mHandler;
+    public Handler getHandler() {
+        return mHandler;
     }
 
     public static class Builder {
@@ -81,36 +80,34 @@ public abstract  class SimpleHttpRequest {
         private File file;
 
 
-        public Builder url(String url)
-        {
+        public Builder url(String url) {
             this.url = url;
             return this;
         }
-        public Builder timeOut(int timeOut)
-        {
+
+        public Builder timeOut(int timeOut) {
             this.timeOut = timeOut;
             return this;
         }
 
-        public Builder params(Map<String, String> params)
-        {
+        public Builder params(Map<String, String> params) {
             this.params = params;
             return this;
         }
 
-        public Builder files(Pair<String, File>[] files){
-            this.files=files;
-            return  this;
-        }
-
-        public Builder destFileDir(String destFileDir){
-            this.destFileDir=destFileDir;
+        public Builder files(Pair<String, File>[] files) {
+            this.files = files;
             return this;
         }
 
-        public Builder destFileName(String destFileName){
-            this.destFileName=destFileName;
-            return  this;
+        public Builder destFileDir(String destFileDir) {
+            this.destFileDir = destFileDir;
+            return this;
+        }
+
+        public Builder destFileName(String destFileName) {
+            this.destFileName = destFileName;
+            return this;
         }
 
         public Builder content(String content) {
@@ -123,150 +120,153 @@ public abstract  class SimpleHttpRequest {
             return this;
         }
 
-        public Builder bytes(byte[] bytes){
-            this.bytes=bytes;
-            return  this;
+        public Builder bytes(byte[] bytes) {
+            this.bytes = bytes;
+            return this;
         }
 
         /**
          * 异步get请求
+         *
          * @param callBack
          * @return
          */
-        public SimpleHttpRequest get(RequestCallback callBack){
-            SimpleGetHttpRequest request=new SimpleGetHttpRequest(url,params,callBack);
-            request.timeOut=timeOut<=0?3000:timeOut;
+        public SimpleHttpRequest get(RequestCallback callBack) {
+            SimpleGetHttpRequest request = new SimpleGetHttpRequest(url, params, callBack);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
-            return  request;
+            return request;
         }
 
         /**
          * 同步get请求
+         *
          * @param resultType
          * @param <T>
          * @return
          */
-        public <T>T getSync(SimpleType<T> resultType){
-            SimpleGetHttpRequest request=new SimpleGetHttpRequest(url,params,null);
-            request.timeOut=timeOut<=0?3000:timeOut;
+        public <T> T getSync(SimpleType<T> resultType) throws Exception {
+            SimpleGetHttpRequest request = new SimpleGetHttpRequest(url, params, null);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             return request.syncExecute(resultType);
         }
 
         /**
          * 异步post请求
+         *
          * @param callBack
          * @return
          */
-        public SimpleHttpRequest post(RequestCallback callBack){
-            SimplePostHttpRequest request=new SimplePostHttpRequest(url,params,content,bytes,file,callBack);
-            request.timeOut=timeOut<=0?3000:timeOut;
+        public SimpleHttpRequest post(RequestCallback callBack) {
+            SimplePostHttpRequest request = new SimplePostHttpRequest(url, params, content, bytes, file, callBack);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
-            return  request;
+            return request;
         }
 
         /**
          * 同步post请求
+         *
          * @param resultType
          * @param <T>
          * @return
          */
-        public <T>T postSync(SimpleType<T> resultType){
-            SimplePostHttpRequest request=new SimplePostHttpRequest(url,params,content,bytes,file,null);
-            request.timeOut=timeOut<=0?3000:timeOut;
+        public <T> T postSync(SimpleType<T> resultType) throws Exception {
+            SimplePostHttpRequest request = new SimplePostHttpRequest(url, params, content, bytes, file, null);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             return request.syncExecute(resultType);
         }
 
         /**
          * 文件下载
+         *
          * @param callBack
          * @return
          */
-        public SimpleHttpRequest download(RequestCallback callBack){
-            SimpleDownloadRequest request=new SimpleDownloadRequest(url,params,callBack,destFileName,destFileDir);
-            request.timeOut=timeOut<=0?3000:timeOut;
+        public SimpleHttpRequest download(RequestCallback callBack) {
+            SimpleDownloadRequest request = new SimpleDownloadRequest(url, params, callBack, destFileName, destFileDir);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
-            return  request;
+            return request;
         }
 
         /**
          * 异步文传上传
+         *
          * @param callBack
          * @return
          */
-        public SimpleHttpRequest upload(RequestCallback callBack){
-            SimpleUploadRequest request=new SimpleUploadRequest(url,params,files,callBack);
-            request.timeOut=timeOut<=0?3000:timeOut;
+        public SimpleHttpRequest upload(RequestCallback callBack) {
+            SimpleUploadRequest request = new SimpleUploadRequest(url, params, files, callBack);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
-            return  request;
+            return request;
         }
 
         /**
          * 同步文传上传
+         *
          * @param resultType
          * @param <T>
          * @return
          */
-        public <T>T uploadSync(SimpleType<T> resultType){
-            SimpleUploadRequest request=new SimpleUploadRequest(url,params,files,null);
-            request.timeOut=timeOut<=0?3000:timeOut;
-            return  request.syncExecute(resultType);
+        public <T> T uploadSync(SimpleType<T> resultType) throws Exception {
+            SimpleUploadRequest request = new SimpleUploadRequest(url, params, files, null);
+            request.timeOut = timeOut <= 0 ? 3000 : timeOut;
+            return request.syncExecute(resultType);
         }
 
 
     }
 
-    protected  void asynExecute(){
-        if(callBack==null)  {
-            callBack=RequestCallback.DEFAULT_RESULT_CALLBACK;
+    protected void asynExecute() {
+        if (callBack == null) {
+            callBack = RequestCallback.DEFAULT_RESULT_CALLBACK;
         }
         callBack.onStart();
         taskExecutor.execute(runnable);
     }
 
 
-    protected <T>T syncExecute(SimpleType<T> resultType){
-        try {
-            if(isCancel) {
-                sendCancel();
-                return null;
-            }
-            initConnection();
-            if(isCancel) {
-                sendCancel();
-                return null;
-            }
-            buildRequestBody();
-            if(isCancel) {
-                sendCancel();
-                return null;
-            }
-            if(conn.getResponseCode()>400 && conn.getResponseCode()<599){
-                throw new RuntimeException(conn.getResponseCode()+" "+conn.getResponseMessage());
-            }
-            return execute(resultType);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    protected <T> T syncExecute(SimpleType<T> resultType) throws Exception {
+        if (isCancel) {
+            sendCancel();
+            return null;
         }
+        initConnection();
+        if (isCancel) {
+            sendCancel();
+            return null;
+        }
+        buildRequestBody();
+        if (isCancel) {
+            sendCancel();
+            return null;
+        }
+        if (conn.getResponseCode() > 400 && conn.getResponseCode() < 599) {
+            throw new RuntimeException(conn.getResponseCode() + " " + conn.getResponseMessage());
+        }
+        return execute(resultType);
     }
 
-    private Runnable runnable=new Runnable() {
+    private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             try {
-                if(isCancel) {
+                if (isCancel) {
                     sendCancel();
                     return;
                 }
                 initConnection();
-                if(isCancel) {
+                if (isCancel) {
                     sendCancel();
                     return;
                 }
                 buildRequestBody();
-                if(conn.getResponseCode()>400 && conn.getResponseCode()<599){
-                    throw new RuntimeException(conn.getResponseCode()+" "+conn.getResponseMessage());
+                if (conn.getResponseCode() > 400 && conn.getResponseCode() < 599) {
+                    throw new RuntimeException(conn.getResponseCode() + " " + conn.getResponseMessage());
                 }
-                if(isCancel) {
+                if (isCancel) {
                     sendCancel();
                     return;
                 }
@@ -278,8 +278,8 @@ public abstract  class SimpleHttpRequest {
         }
     };
 
-    protected  void sendError(final Exception ex){
-        if(callBack==null) return;
+    protected void sendError(final Exception ex) {
+        if (callBack == null) return;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -288,8 +288,8 @@ public abstract  class SimpleHttpRequest {
         });
     }
 
-    protected  void sendCancel(){
-        if(callBack==null) return;
+    protected void sendCancel() {
+        if (callBack == null) return;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -298,8 +298,8 @@ public abstract  class SimpleHttpRequest {
         });
     }
 
-    protected  void sendSuccess(final Object obj){
-        if(callBack==null) return;
+    protected void sendSuccess(final Object obj) {
+        if (callBack == null) return;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -308,8 +308,8 @@ public abstract  class SimpleHttpRequest {
         });
     }
 
-    protected  void sendProgress(final long total, final long current, final boolean isUploading){
-        if(callBack==null) return;
+    protected void sendProgress(final long total, final long current, final boolean isUploading) {
+        if (callBack == null) return;
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -319,16 +319,13 @@ public abstract  class SimpleHttpRequest {
     }
 
 
-    protected String appendParams(Map<String, String> params)
-    {
-       if (params==null || params.isEmpty()){
-           return  null;
-       }
+    protected String appendParams(Map<String, String> params) {
+        if (params == null || params.isEmpty()) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
-        if (params != null && !params.isEmpty())
-        {
-            for (String key : params.keySet())
-            {
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
                 sb.append(key).append("=").append(params.get(key)).append("&");
             }
         }
@@ -337,13 +334,13 @@ public abstract  class SimpleHttpRequest {
         return sb.toString();
     }
 
-    protected  <T>T execute(SimpleType<T> resultType) throws Exception{
+    protected <T> T execute(SimpleType<T> resultType) throws Exception {
         InputStream is = conn.getInputStream();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         int length;
         while ((length = is.read(buffer)) != -1) {
-            if(isCancel) {
+            if (isCancel) {
                 sendCancel();
                 return null;
             }
@@ -353,15 +350,15 @@ public abstract  class SimpleHttpRequest {
         is.close();
         conn.disconnect();
         String body = new String(baos.toByteArray(), charset);
-        Type type=(callBack==null)?resultType.getType():callBack.mType;
+        Type type = (callBack == null) ? resultType.getType() : callBack.mType;
         if (type == String.class) {
-            if(resultType!=null) return (T)body;
+            if (resultType != null) return (T) body;
             else {
                 sendSuccess(body);
             }
         } else {
             Object object = JSON.parseObject(body, type);
-            if(resultType!=null) return  (T)object;
+            if (resultType != null) return (T) object;
             else {
                 sendSuccess(object);
             }
@@ -370,8 +367,8 @@ public abstract  class SimpleHttpRequest {
     }
 
 
-    public void cancel(){
-        isCancel=true;
+    public void cancel() {
+        isCancel = true;
     }
 
 
@@ -396,5 +393,6 @@ public abstract  class SimpleHttpRequest {
 
 
     protected abstract void initConnection() throws Exception;
+
     protected abstract void buildRequestBody() throws Exception;
 }

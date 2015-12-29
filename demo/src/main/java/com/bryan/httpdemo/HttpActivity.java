@@ -107,10 +107,16 @@ public class HttpActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-               String result= new SimpleHttpRequest.Builder()
-                 .url("http://192.168.6.59:8080/web/LoginServlet")
-                .params(params)
-                .postSync(new SimpleType<String>(){});
+                String result= "";
+                try {
+                    result = new SimpleHttpRequest.Builder()
+                      .url("http://192.168.6.59:8080/web/LoginServlet")
+                     .params(params)
+                     .postSync(new SimpleType<String>() {
+                     });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 Log.d(TAG,result);
             }
         }).start();
@@ -162,10 +168,15 @@ public class HttpActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<Course> courses=new SimpleHttpRequest.Builder()
-                        .url("http://192.168.6.59:8080/web/ListServlet")
-                        .params(params)
-                        .getSync(new SimpleType<List<Course>>(){});
+                List<Course> courses= null;
+                try {
+                    courses = new SimpleHttpRequest.Builder()
+                            .url("http://192.168.6.59:8080/web/ListServlet")
+                            .params(params)
+                            .getSync(new SimpleType<List<Course>>(){});
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 Log.d(TAG,courses.get(0).toString());
             }
         }).start();
