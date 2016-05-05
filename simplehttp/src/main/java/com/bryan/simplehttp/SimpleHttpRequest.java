@@ -26,10 +26,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 /**
- * 简单封装Http的操作，不使用第三方类库
- * 支持https
- * 模型解析使用了FastJson，也可以不用
- * <p/>
+ * a simple http libray ,not use another library
+ * support https
+ * default use fastjsom for model parse
  * Authro：Cxb
  */
 
@@ -126,7 +125,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 异步get请求
+         * async get request
          *
          * @param callBack
          * @return
@@ -139,7 +138,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 同步get请求
+         * Sync get request
          *
          * @param resultType
          * @param <T>
@@ -152,7 +151,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 异步post请求
+         * async post request
          *
          * @param callBack
          * @return
@@ -165,7 +164,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 同步post请求
+         * Sync post request
          *
          * @param resultType
          * @param <T>
@@ -178,7 +177,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 文件下载
+         * file download
          *
          * @param callBack
          * @return
@@ -191,7 +190,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 异步文传上传
+         * async file upload
          *
          * @param callBack
          * @return
@@ -204,7 +203,7 @@ public abstract class SimpleHttpRequest {
         }
 
         /**
-         * 同步文传上传
+         * sync file upload
          *
          * @param resultType
          * @param <T>

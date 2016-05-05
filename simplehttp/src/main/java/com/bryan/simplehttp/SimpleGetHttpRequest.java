@@ -31,12 +31,12 @@ public class SimpleGetHttpRequest  extends  SimpleHttpRequest{
         URL netUrl = new URL(url);
         conn = (HttpURLConnection) netUrl.openConnection();
         if (url.startsWith("https")){
-            //设置SSLContext
+            //set SSLContext
             SSLContext sslcontext = SSLContext.getInstance("TLS");
             sslcontext.init(null, new TrustManager[]{myX509TrustManager}, new SecureRandom());
             HttpsURLConnection httpsConn=
                     (HttpsURLConnection)conn;
-            //设置套接工厂
+            //set socketFactory
             httpsConn.setSSLSocketFactory(sslcontext.getSocketFactory());
             httpsConn.setHostnameVerifier(new HostnameVerifier() {
                 @Override

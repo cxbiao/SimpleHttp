@@ -1,8 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 11
@@ -22,4 +23,14 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.alibaba:fastjson:1.1.46.android'
     testCompile 'junit:junit:4.12'
+}
+
+
+publish {
+    userOrg = 'bryan' //bintray.com用户名
+    groupId = 'com.bryan'//jcenter上的路径
+    artifactId = 'simplehttp'//项目名称
+    publishVersion = '1.0.0'//版本号
+    desc = 'A http library'//描述，不重要
+    website = 'https://github.com/cxbiao/SimpleHttp'//网站，不重要
 }

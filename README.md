@@ -1,6 +1,11 @@
 
 #非常简单的HTTP封装类库，支持HTTPS，仅使用原生的UrlConnection,并集成fastjson自动解析实体对象
 
+###集成方法
+```
+compile 'com.bryan:simplehttp:1.0.0'
+```
+
 - Get用法1
 ```
 new SimpleHttpRequest.Builder()

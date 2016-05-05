@@ -41,12 +41,11 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
         URL netUrl = new URL(url);
         conn = (HttpURLConnection) netUrl.openConnection();
         if (url.startsWith("https")){
-            //设置SSLContext
+            //set SSLContext
             SSLContext sslcontext = SSLContext.getInstance("TLS");
             sslcontext.init(null, new TrustManager[]{myX509TrustManager}, new SecureRandom());
             HttpsURLConnection httpsConn=
                     (HttpsURLConnection)conn;
-            //设置套接工厂
             httpsConn.setSSLSocketFactory(sslcontext.getSocketFactory());
             httpsConn.setHostnameVerifier(new HostnameVerifier() {
                 @Override
@@ -75,7 +74,7 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
     }
 
 
-    //普通字符串数据
+    //simple form data
     private void writeStringParams() throws Exception {
 
         if(params==null || params.isEmpty()){
@@ -94,7 +93,7 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
         }
     }
 
-    //文件数据
+    //file bytes
     private void writeFileParams() {
         try {
             for (int i = 0; i < files.length; i++) {
@@ -116,7 +115,7 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
 
     }
 
-    //添加结尾数据
+    //append end data
     private void paramsEnd() throws Exception {
         dos.writeBytes("--" + boundary + "--" + "\r\n");
         dos.writeBytes("\r\n");

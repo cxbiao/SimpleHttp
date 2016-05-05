@@ -32,7 +32,7 @@ public class HttpActivity extends AppCompatActivity {
         @Override
         public void onSuccess(String response) {
             webContent.setText(Html.fromHtml(response));
-            Log.d(TAG, response);
+            Log.e(TAG, response);
         }
 
         @Override
@@ -43,13 +43,13 @@ public class HttpActivity extends AppCompatActivity {
 
         @Override
         public void onProgress(long total, long current, boolean isUploading) {
-            Log.d(TAG,"total:"+total+",current:"+current+",isUploading:"+isUploading);
+            Log.e(TAG,"total:"+total+",current:"+current+",isUploading:"+isUploading);
         }
 
         @Override
         public void onCancel() {
             webContent.setText("onCancel");
-            Log.d(TAG, "onCancel");
+            Log.e(TAG, "onCancel");
         }
     };
 
@@ -57,7 +57,7 @@ public class HttpActivity extends AppCompatActivity {
         @Override
         public void onSuccess(Person response) {
             webContent.setText(Html.fromHtml(response.toString()));
-            Log.d(TAG,response.toString());
+            Log.e(TAG,response.toString());
         }
 
         @Override
@@ -72,7 +72,7 @@ public class HttpActivity extends AppCompatActivity {
         @Override
         public void onSuccess(List<Course> response) {
             for(Course c:response){
-                Log.d(TAG,c.toString());
+                Log.e(TAG,c.toString());
             }
         }
 
@@ -177,7 +177,7 @@ public class HttpActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG,courses.get(0).toString());
+                Log.e(TAG,courses.get(0).toString());
             }
         }).start();
     }
