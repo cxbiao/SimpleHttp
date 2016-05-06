@@ -98,7 +98,16 @@ new SimpleHttpRequest.Builder()
             .upload(myCallBack);
 ```
 
-###7 自定义CallBack
+###7 添加header
+
+```
+ SimpleHttpRequest request=new SimpleHttpRequest.Builder()
+                .addHeader("content-Type","text/plain")
+                .addHeader("Connection","keep-alive")
+                ......
+```
+
+###8 自定义CallBack
 
 ```
  RequestCallback<String> myCallBack = new RequestCallback<String>() {
@@ -128,7 +137,7 @@ new SimpleHttpRequest.Builder()
 ```
 
 
-###8 取消单个请求
+###9 取消单个请求
 ```
      SimpleHttpRequest request= new SimpleHttpRequest.Builder()...
      request.cancel();

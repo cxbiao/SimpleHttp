@@ -440,14 +440,15 @@ public abstract class SimpleHttpRequest {
     protected abstract void buildRequestBody() throws Exception;
 
     protected void writeHeaders() throws Exception{
+        if(!TextUtils.isEmpty(contentType)){
+            conn.setRequestProperty("Content-Type",contentType);
+        }
         if(headers==null || headers.size()==0){
             return;
         }
         for(Map.Entry<String,String> entry:headers.entrySet()){
             conn.setRequestProperty(entry.getKey(),entry.getValue());
         }
-        if(!TextUtils.isEmpty(contentType)){
-            conn.setRequestProperty("Content-Type",contentType);
-        }
+
     }
 }
