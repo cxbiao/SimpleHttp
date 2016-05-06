@@ -1,20 +1,35 @@
 
-#非常简单的HTTP封装类库，支持HTTPS，仅使用原生的UrlConnection,并集成fastjson自动解析实体对象
+#SimpleHttp
 
-###集成方法
+- 使用原生UrlConnection（无第三方依赖）
+- 支持HTTPS
+- 支持同步和异步
+- 自动解析实体对象（默认使用fastjson）
+
+###用法
 ```
 compile 'com.bryan:simplehttp:1.0.0'
 ```
 
-- Get用法1
+###1.异步Get请求
+
 ```
 new SimpleHttpRequest.Builder()
                 .url("https://kyfw.12306.cn/otn/")
                 .get(myCallBack);
 ```
 
-- Get用法2
 
+###2.同步Get请求
+
+```
+String result=new SimpleHttpRequest.Builder()
+                  .url("http://www.baidu.com")
+                  .getSync(String.class);
+```
+
+
+###3 异步Post请求
 ```
 RequestCallback<List<Course>> model2CallBack=new RequestCallback<List<Course>>() {
         @Override
@@ -31,30 +46,31 @@ RequestCallback<List<Course>> model2CallBack=new RequestCallback<List<Course>>()
         }
     };
 
-Map<String, String> params = new HashMap<>();
-        params.put("format", "json");
-        new SimpleHttpRequest.Builder()
-                .url("http://192.168.6.59:8080/web/ListServlet")
-                .params(params)
-                .get(model2CallBack);
+List<FormParam> params = new ArrayList<>();
+params.add(new FormParam("username", "qq"));
+params.add(new FormParam("password", "说明"));
+params.put("format", "json");
+new SimpleHttpRequest.Builder()
+             .url("http://192.168.6.59:8080/web/ListServlet")
+             .params(params)
+             .post(model2CallBack);
 
 ```
 
 
-- Post用法
+###4 Post请求json
 
 ```
-  Map<String, String> params = new HashMap<>();
-        params.put("username", "qq");
-        params.put("password", "说明");
-        new SimpleHttpRequest.Builder()
-                .url("http://192.168.6.59:8080/web/LoginServlet")
-                .params(params)
-                .post(myCallBack);
+ String json="{\"id\":2,\"name\":\"liky\"}";
+ new SimpleHttpRequest.Builder()
+               .url("http://192.168.6.59:8080/web/LoginServlet")
+               .contentType(SimplePostHttpRequest.MEDIA_TYPE_JSON)
+               .content(json)
+               .post(model1CallBack);
 
 ```
 
-- 下载（支持进度回调）
+###5 下载（支持下载进度）
 
 ```
  new SimpleHttpRequest.Builder()
@@ -64,21 +80,56 @@ Map<String, String> params = new HashMap<>();
                 .download(myCallBack);
 ```
 
-- 上传（支持进度回调）
+###6 文件上传（支持上传进度）
 
 ```
-  Map<String, String> params = new HashMap<>();
-        params.put("filename", "music");
-        params.put("filedes", "中国心");
-        Pair<String,File>[] files=new Pair[]{
-                new Pair("file",new File(
-                Environment.getExternalStorageDirectory(),"qq中国.jpg"))
-        };
-        new SimpleHttpRequest.Builder()
-                .url("http://192.168.6.59:8080/web/UploadFileServlet")
-                .params(params)
-                .files(files)
-                .upload(myCallBack);
+ List<FileParam> fileParams=new ArrayList<>();
+ fileParams.add(new FileParam("file",null,new File(
+           Environment.getExternalStorageDirectory(),"qq中国.jpg")));
+ fileParams.add(new FileParam("file",null,new File(
+           Environment.getExternalStorageDirectory(),"abc.jpg")));
+ fileParams.add(new FileParam("file",null,new File(
+           Environment.getExternalStorageDirectory(),"hehe.doc")));
+ new SimpleHttpRequest.Builder()
+            .url("http://192.168.6.59:8080/web/UploadFileServlet")
+            .addParam("filename", "music")
+            .addParam("filedes", "发如雪")
+            .files(fileParams)
+            .upload(myCallBack);
+```
+
+###7 自定义CallBack
+
+```
+ RequestCallback<String> myCallBack = new RequestCallback<String>() {
+        @Override
+        public void onSuccess(String response) {
+            webContent.setText(Html.fromHtml(response));
+            Log.e(TAG, response);
+        }
+
+        @Override
+        public void onError(Exception e) {
+            webContent.setText(Html.fromHtml(e.getMessage()));
+            Log.e(TAG,e.getMessage());
+        }
+
+        @Override
+        public void onProgress(long total, long current, boolean isUploading) {
+            Log.e(TAG,"total:"+total+",current:"+current+",isUploading:"+isUploading);
+        }
+
+        @Override
+        public void onCancel() {
+            webContent.setText("onCancel");
+            Log.e(TAG, "onCancel");
+        }
+    };
 ```
 
 
+###8 取消单个请求
+```
+     SimpleHttpRequest request= new SimpleHttpRequest.Builder()...
+     request.cancel();
+```

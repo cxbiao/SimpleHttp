@@ -1,4 +1,4 @@
-package com.bryan.simplehttp;
+package com.bryan.simplehttp.request;
 
 import android.text.TextUtils;
 
@@ -7,6 +7,7 @@ import com.bryan.simplehttp.callback.RequestCallback;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -18,8 +19,8 @@ import javax.net.ssl.TrustManager;
 
 public class SimpleGetHttpRequest  extends  SimpleHttpRequest{
 
-    public SimpleGetHttpRequest(String url, Map<String, String> params, RequestCallback callBack) {
-        super(url, params, callBack);
+    public SimpleGetHttpRequest(String url,String contentType, List<FormParam> params, Map<String,String> headers,RequestCallback callBack) {
+        super(url,contentType, params, headers,callBack);
     }
 
     @Override

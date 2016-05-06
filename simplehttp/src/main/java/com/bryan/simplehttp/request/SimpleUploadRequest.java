@@ -1,19 +1,17 @@
-package com.bryan.simplehttp;
+package com.bryan.simplehttp.request;
 
-import android.util.Pair;
+import android.text.TextUtils;
 
 import com.bryan.simplehttp.callback.RequestCallback;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.net.FileNameMap;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.SecureRandom;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -25,17 +23,17 @@ import javax.net.ssl.TrustManager;
 public class SimpleUploadRequest extends SimplePostHttpRequest {
 
     private static final String boundary = "--------hellobryan";
-    private Pair<String, File>[] files;
+    private  List<FileParam> files;
     private DataOutputStream dos;
 
-    public SimpleUploadRequest(String url, Map<String, String> params, Pair<String, File>[] files, RequestCallback callBack) {
-        super(url, params, null,null,null,callBack);
+    public SimpleUploadRequest(String url,String contentType, List<FormParam> params, List<FileParam> files, Map<String,String> headers, RequestCallback callBack) {
+        super(url,contentType, params, headers,null,null,null,callBack);
         this.files = files;
     }
 
     @Override
     protected void initConnection() throws Exception {
-        if(files==null || files.length==0){
+        if(files==null || files.size()==0){
             throw new IllegalArgumentException("the files cannot be null");
         }
         URL netUrl = new URL(url);
@@ -80,15 +78,12 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
         if(params==null || params.isEmpty()){
             return;
         }
-        Set<String> keySet = params.keySet();
-        for (Iterator<String> it = keySet.iterator(); it.hasNext(); ) {
-            String name = it.next();
-            String value = params.get(name);
+        for (FormParam param:params ) {
             dos.writeBytes("--" + boundary + "\r\n");
-            dos.writeBytes("Content-Disposition: form-data; name=\"" + name
+            dos.writeBytes("Content-Disposition: form-data; name=\"" + param.key
                     + "\"\r\n");
             dos.writeBytes("\r\n");
-            dos.write(value.getBytes());
+            dos.write(param.value.getBytes());
             dos.writeBytes("\r\n");
         }
     }
@@ -96,16 +91,15 @@ public class SimpleUploadRequest extends SimplePostHttpRequest {
     //file bytes
     private void writeFileParams() {
         try {
-            for (int i = 0; i < files.length; i++) {
-                String name = files[i].first;
-                File file = files[i].second;
-                String encodeName = new String(file.getName().getBytes("UTF-8"), "ISO-8859-1");
+            for (FileParam fileParam:files) {
+                String fname = TextUtils.isEmpty(fileParam.fileName)?fileParam.file.getName():fileParam.fileName;
+                String encodeName = new String(fname.getBytes("UTF-8"), "ISO-8859-1");
                 dos.writeBytes("--" + boundary + "\r\n");
-                dos.writeBytes("Content-Disposition: form-data; name=\"" + name
+                dos.writeBytes("Content-Disposition: form-data; name=\"" + fileParam.key
                         + "\"; filename=\"" + encodeName + "\"\r\n");
-                dos.writeBytes("Content-Type: " + guessMimeType(file.getName()) + "\r\n");
+                dos.writeBytes("Content-Type: " + guessMimeType(fileParam.file.getName()) + "\r\n");
                 dos.writeBytes("\r\n");
-                dos.write(getFileBytes(file));
+                dos.write(getFileBytes(fileParam.file));
                 dos.writeBytes("\r\n");
             }
 

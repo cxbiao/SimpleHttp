@@ -5,20 +5,21 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
 
 import com.bryan.httpdemo.model.Course;
 import com.bryan.httpdemo.model.Person;
-import com.bryan.simplehttp.SimpleHttpRequest;
 import com.bryan.simplehttp.callback.RequestCallback;
 import com.bryan.simplehttp.callback.SimpleType;
+import com.bryan.simplehttp.request.FileParam;
+import com.bryan.simplehttp.request.FormParam;
+import com.bryan.simplehttp.request.SimpleHttpRequest;
+import com.bryan.simplehttp.request.SimplePostHttpRequest;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2015/11/13.
@@ -96,9 +97,9 @@ public class HttpActivity extends AppCompatActivity {
 
     public void post(View v) {
 
-        final Map<String, String> params = new HashMap<>();
-        params.put("username", "qq");
-        params.put("password", "说明");
+        final List<FormParam> params = new ArrayList<>();
+        params.add(new FormParam("username", "qq"));
+        params.add(new FormParam("password", "说明"));
 //        new SimpleHttpRequest.Builder()
 //                .url("http://192.168.6.59:8080/web/LoginServlet")
 //                .params(params)
@@ -111,7 +112,8 @@ public class HttpActivity extends AppCompatActivity {
                 try {
                     result = new SimpleHttpRequest.Builder()
                       .url("http://192.168.6.59:8080/web/LoginServlet")
-                     .params(params)
+                      .addParam("username", "qq")
+                      .addParam("password", "说明")
                      .postSync(new SimpleType<String>() {
                      });
                 } catch (Exception e) {
@@ -120,6 +122,18 @@ public class HttpActivity extends AppCompatActivity {
                 Log.d(TAG,result);
             }
         }).start();
+    }
+
+
+    public void postJson(View v){
+        String json="{\"id\":2,\"name\":\"liky\"}";
+         new SimpleHttpRequest.Builder()
+                 .url("http://192.168.6.59:8080/web/LoginServlet")
+                 .contentType(SimplePostHttpRequest.MEDIA_TYPE_JSON)
+                 .content(json)
+                 .post(model1CallBack);
+
+
     }
 
     public void get(View v){
@@ -158,8 +172,8 @@ public class HttpActivity extends AppCompatActivity {
     }
 
     public void getCourse(View v){
-        final Map<String, String> params = new HashMap<>();
-        params.put("format", "json");
+        final List<FormParam> params = new ArrayList<>();
+        params.add(new FormParam("format", "json"));
 //        new SimpleHttpRequest.Builder()
 //                .url("http://192.168.6.59:8080/web/ListServlet")
 //                .params(params)
@@ -174,10 +188,11 @@ public class HttpActivity extends AppCompatActivity {
                             .url("http://192.168.6.59:8080/web/ListServlet")
                             .params(params)
                             .getSync(new SimpleType<List<Course>>(){});
+                    Log.e(TAG,courses.get(0).toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Log.e(TAG,courses.get(0).toString());
+
             }
         }).start();
     }
@@ -201,17 +216,19 @@ public class HttpActivity extends AppCompatActivity {
     }
 
     public void upload(View v){
-        Map<String, String> params = new HashMap<>();
-        params.put("filename", "music");
-        params.put("filedes", "发如雪");
-        Pair<String,File>[] files=new Pair[]{
-                new Pair("file",new File(
-                Environment.getExternalStorageDirectory(),"qq中国.jpg"))
-        };
+
+        List<FileParam> fileParams=new ArrayList<>();
+        fileParams.add(new FileParam("file",null,new File(
+                Environment.getExternalStorageDirectory(),"qq中国.jpg")));
+        fileParams.add(new FileParam("file",null,new File(
+                Environment.getExternalStorageDirectory(),"abc.jpg")));
+        fileParams.add(new FileParam("file",null,new File(
+                Environment.getExternalStorageDirectory(),"hehe.doc")));
         new SimpleHttpRequest.Builder()
                 .url("http://192.168.6.59:8080/web/UploadFileServlet")
-                .params(params)
-                .files(files)
+                .addParam("filename", "music")
+                .addParam("filedes", "发如雪")
+                .files(fileParams)
                 .upload(myCallBack);
     }
 }

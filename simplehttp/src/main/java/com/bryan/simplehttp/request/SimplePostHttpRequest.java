@@ -1,5 +1,7 @@
-package com.bryan.simplehttp;
+package com.bryan.simplehttp.request;
 
+
+import android.text.TextUtils;
 
 import com.bryan.simplehttp.callback.RequestCallback;
 
@@ -10,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -31,54 +34,38 @@ public class SimplePostHttpRequest extends SimpleHttpRequest {
     private static final int TYPE_BYTES = 3;
     private static final int TYPE_FILE = 4;
 
-    private final String  MEDIA_TYPE_FORM = "application/x-www-form-urlencoded";
-    private final String  MEDIA_TYPE_STREAM = "application/octet-stream";
-    private final String  MEDIA_TYPE_STRING = "text/plain;charset=utf-8";
-
-    public SimplePostHttpRequest(String url, Map<String, String> params, String content,byte[] bytes,File file,RequestCallback callBack) {
-        super(url, params, callBack);
+    public static final String  MEDIA_TYPE_FORM = "application/x-www-form-urlencoded";
+    public static final String  MEDIA_TYPE_STREAM = "application/octet-stream";
+    public static final String  MEDIA_TYPE_STRING = "text/plain;charset=utf-8";
+    public static final String  MEDIA_TYPE_JSON = "application/json;charset=utf-8";
+    public SimplePostHttpRequest(String url,String contentType, List<FormParam> params, Map<String,String> headers, String content, byte[] bytes, File file, RequestCallback callBack) {
+        super(url,contentType, params, headers,callBack);
         this.content = content;
         this.bytes = bytes;
         this.file = file;
-        validParams();
+
     }
 
 
-    protected void validParams()
-    {
-        int count = 0;
-        if (params != null && !params.isEmpty())
-        {
+    protected void validParams() {
+        if (params != null && !params.isEmpty()) {
             type = TYPE_PARAMS;
-            count++;
         }
-        if (content != null)
-        {
+        if (content != null) {
             type = TYPE_STRING;
-            count++;
         }
-        if (bytes != null)
-        {
+        if (bytes != null) {
             type = TYPE_BYTES;
-            count++;
         }
-        if (file != null)
-        {
+        if (file != null) {
             type = TYPE_FILE;
-            count++;
         }
 
-        if (count <= 0 || count > 1)
-        {
-            throw new IllegalArgumentException("the params , content , file , bytes must has one and only one .");
-        }
     }
 
     @Override
     protected void initConnection() throws Exception {
-        if(params==null || params.isEmpty()){
-            throw new IllegalArgumentException("the parmas cannot be null");
-        }
+        validParams();
         URL netUrl = new URL(url);
         conn = (HttpURLConnection) netUrl.openConnection();
         if (url.startsWith("https")){
@@ -113,22 +100,26 @@ public class SimplePostHttpRequest extends SimpleHttpRequest {
         OutputStream os;
         switch (type){
             case TYPE_PARAMS:
-                conn.setRequestProperty("Content-Type", MEDIA_TYPE_FORM);
+                if(TextUtils.isEmpty(contentType))
+                  conn.setRequestProperty("Content-Type", MEDIA_TYPE_FORM);
                 String postStr = appendParams(params);
                 os=conn.getOutputStream();
                 os.write(postStr.getBytes("UTF-8"));
                 break;
             case TYPE_STRING:
+                if(TextUtils.isEmpty(contentType))
                 conn.setRequestProperty("Content-Type", MEDIA_TYPE_STRING);
                 os=conn.getOutputStream();
                 os.write(content.getBytes("UTF-8"));
                 break;
             case TYPE_BYTES:
+                if(TextUtils.isEmpty(contentType))
                 conn.setRequestProperty("Content-Type", MEDIA_TYPE_STREAM);
                 os=conn.getOutputStream();
                 os.write(bytes);
                 break;
             case TYPE_FILE:
+                if(TextUtils.isEmpty(contentType))
                 conn.setRequestProperty("Content-Type", MEDIA_TYPE_STREAM);
                 os=conn.getOutputStream();
                 os.write(getFileBytes(file));

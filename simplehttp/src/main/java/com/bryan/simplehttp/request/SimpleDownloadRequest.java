@@ -1,4 +1,4 @@
-package com.bryan.simplehttp;
+package com.bryan.simplehttp.request;
 
 
 import com.bryan.simplehttp.callback.RequestCallback;
@@ -7,6 +7,7 @@ import com.bryan.simplehttp.callback.SimpleType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 public class SimpleDownloadRequest  extends  SimpleGetHttpRequest{
@@ -14,8 +15,8 @@ public class SimpleDownloadRequest  extends  SimpleGetHttpRequest{
     private String destFileDir;
     private String destFileName;
 
-    public SimpleDownloadRequest(String url, Map<String, String> params, RequestCallback callBack, String destFileName,String destFileDir) {
-        super(url, params, callBack);
+    public SimpleDownloadRequest(String url,String contentType, List<FormParam> params, Map<String,String> headers, RequestCallback callBack, String destFileName, String destFileDir) {
+        super(url, contentType,params,headers, callBack);
         this.destFileDir=destFileDir;
         this.destFileName=destFileName;
     }

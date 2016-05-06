@@ -1,10 +1,10 @@
 
 
-package com.bryan.simplehttp;
+package com.bryan.simplehttp.request;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Pair;
+import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.bryan.simplehttp.callback.RequestCallback;
@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -45,7 +48,9 @@ public abstract class SimpleHttpRequest {
 
 
     protected String url;
-    protected Map<String, String> params;
+    protected List<FormParam> params;
+    protected Map<String,String> headers;
+    protected String contentType;
     protected RequestCallback callBack;
     private Handler mHandler = new Handler(Looper.getMainLooper());
     protected int timeOut = 3000;
@@ -54,9 +59,11 @@ public abstract class SimpleHttpRequest {
     protected boolean isCancel;
 
 
-    public SimpleHttpRequest(String url, Map<String, String> params, RequestCallback callBack) {
+    public SimpleHttpRequest(String url,String contentType, List<FormParam> params,Map<String,String> headers, RequestCallback callBack) {
         this.url = url;
+        this.contentType=contentType;
         this.params = params;
+        this.headers=headers;
         this.callBack = callBack;
     }
 
@@ -66,12 +73,13 @@ public abstract class SimpleHttpRequest {
 
     public static class Builder {
         private String url;
-        private Map<String, String> params;
-        private Pair<String, File>[] files;
-
+        private List<FormParam> params;
+        private List<FileParam> files;
+        protected Map<String,String> headers;
         private String destFileDir;
         private String destFileName;
         private int timeOut;
+        private String contentType;
 
         //for post
         private String content;
@@ -89,13 +97,47 @@ public abstract class SimpleHttpRequest {
             return this;
         }
 
-        public Builder params(Map<String, String> params) {
+        public Builder contentType(String contentType){
+            this.contentType=contentType;
+            return  this;
+        }
+
+        public Builder params(List<FormParam> params) {
             this.params = params;
             return this;
         }
 
-        public Builder files(Pair<String, File>[] files) {
+        public Builder addParam(String key,String value){
+            if(this.params==null || this.params.size()==0){
+                this.params=new ArrayList<>();
+            }
+            params.add(new FormParam(key,value));
+            return  this;
+        }
+
+        public Builder files(List<FileParam> files) {
             this.files = files;
+            return this;
+        }
+
+        public Builder addFile(String key,String fileName,File file){
+            if(this.files==null || this.files.size()==0){
+                files=new ArrayList<>();
+            }
+            files.add(new FileParam(key,fileName,file));
+            return this;
+        }
+
+        public Builder headers(Map<String,String> headers) {
+            this.headers = headers;
+            return this;
+        }
+
+        public Builder addHeader(String key,String value){
+            if(this.headers==null || this.headers.size()==0){
+                headers=new LinkedHashMap<>();
+            }
+            headers.put(key,value);
             return this;
         }
 
@@ -131,7 +173,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public SimpleHttpRequest get(RequestCallback callBack) {
-            SimpleGetHttpRequest request = new SimpleGetHttpRequest(url, params, callBack);
+            SimpleGetHttpRequest request = new SimpleGetHttpRequest(url,contentType, params, headers,callBack);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
             return request;
@@ -145,7 +187,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public <T> T getSync(SimpleType<T> resultType) throws Exception {
-            SimpleGetHttpRequest request = new SimpleGetHttpRequest(url, params, null);
+            SimpleGetHttpRequest request = new SimpleGetHttpRequest(url,contentType, params, headers,null);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             return request.syncExecute(resultType);
         }
@@ -157,7 +199,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public SimpleHttpRequest post(RequestCallback callBack) {
-            SimplePostHttpRequest request = new SimplePostHttpRequest(url, params, content, bytes, file, callBack);
+            SimplePostHttpRequest request = new SimplePostHttpRequest(url,contentType, params, headers,content, bytes, file, callBack);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
             return request;
@@ -171,7 +213,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public <T> T postSync(SimpleType<T> resultType) throws Exception {
-            SimplePostHttpRequest request = new SimplePostHttpRequest(url, params, content, bytes, file, null);
+            SimplePostHttpRequest request = new SimplePostHttpRequest(url,contentType, params,headers, content, bytes, file, null);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             return request.syncExecute(resultType);
         }
@@ -183,7 +225,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public SimpleHttpRequest download(RequestCallback callBack) {
-            SimpleDownloadRequest request = new SimpleDownloadRequest(url, params, callBack, destFileName, destFileDir);
+            SimpleDownloadRequest request = new SimpleDownloadRequest(url,contentType, params,headers, callBack, destFileName, destFileDir);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
             return request;
@@ -196,7 +238,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public SimpleHttpRequest upload(RequestCallback callBack) {
-            SimpleUploadRequest request = new SimpleUploadRequest(url, params, files, callBack);
+            SimpleUploadRequest request = new SimpleUploadRequest(url, contentType,params, files,headers, callBack);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             request.asynExecute();
             return request;
@@ -210,7 +252,7 @@ public abstract class SimpleHttpRequest {
          * @return
          */
         public <T> T uploadSync(SimpleType<T> resultType) throws Exception {
-            SimpleUploadRequest request = new SimpleUploadRequest(url, params, files, null);
+            SimpleUploadRequest request = new SimpleUploadRequest(url, contentType,params, files,headers, null);
             request.timeOut = timeOut <= 0 ? 3000 : timeOut;
             return request.syncExecute(resultType);
         }
@@ -233,6 +275,7 @@ public abstract class SimpleHttpRequest {
             return null;
         }
         initConnection();
+        writeHeaders();
         if (isCancel) {
             sendCancel();
             return null;
@@ -257,6 +300,7 @@ public abstract class SimpleHttpRequest {
                     return;
                 }
                 initConnection();
+                writeHeaders();
                 if (isCancel) {
                     sendCancel();
                     return;
@@ -318,14 +362,14 @@ public abstract class SimpleHttpRequest {
     }
 
 
-    protected String appendParams(Map<String, String> params) {
+    protected String appendParams(List<FormParam> params) {
         if (params == null || params.isEmpty()) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
         if (params != null && !params.isEmpty()) {
-            for (String key : params.keySet()) {
-                sb.append(key).append("=").append(params.get(key)).append("&");
+            for(FormParam param:params){
+                sb.append(param.key).append("=").append(param.value).append("&");
             }
         }
 
@@ -394,4 +438,16 @@ public abstract class SimpleHttpRequest {
     protected abstract void initConnection() throws Exception;
 
     protected abstract void buildRequestBody() throws Exception;
+
+    protected void writeHeaders() throws Exception{
+        if(headers==null || headers.size()==0){
+            return;
+        }
+        for(Map.Entry<String,String> entry:headers.entrySet()){
+            conn.setRequestProperty(entry.getKey(),entry.getValue());
+        }
+        if(!TextUtils.isEmpty(contentType)){
+            conn.setRequestProperty("Content-Type",contentType);
+        }
+    }
 }
