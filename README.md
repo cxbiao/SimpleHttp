@@ -8,7 +8,7 @@
 
 ###用法
 ```
-compile 'com.bryan:simplehttp:1.0.0'
+compile 'com.bryan:simplehttp:1.1.0'
 ```
 
 ###1.同步Get请求

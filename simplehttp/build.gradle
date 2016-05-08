@@ -30,7 +30,7 @@ publish {
     userOrg = 'bryan' //bintray.com用户名
     groupId = 'com.bryan'//jcenter上的路径
     artifactId = 'simplehttp'//项目名称
-    publishVersion = '1.0.0'//版本号
+    publishVersion = '1.1.0'//版本号
     desc = 'A http library'//描述，不重要
     website = 'https://github.com/cxbiao/SimpleHttp'//网站，不重要
 }
