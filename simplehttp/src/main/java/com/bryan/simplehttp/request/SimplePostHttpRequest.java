@@ -34,10 +34,6 @@ public class SimplePostHttpRequest extends SimpleHttpRequest {
     private static final int TYPE_BYTES = 3;
     private static final int TYPE_FILE = 4;
 
-    public static final String  MEDIA_TYPE_FORM = "application/x-www-form-urlencoded";
-    public static final String  MEDIA_TYPE_STREAM = "application/octet-stream";
-    public static final String  MEDIA_TYPE_STRING = "text/plain;charset=utf-8";
-    public static final String  MEDIA_TYPE_JSON = "application/json;charset=utf-8";
     public SimplePostHttpRequest(String url,String contentType, List<FormParam> params, Map<String,String> headers, String content, byte[] bytes, File file, RequestCallback callBack) {
         super(url,contentType, params, headers,callBack);
         this.content = content;
@@ -101,26 +97,26 @@ public class SimplePostHttpRequest extends SimpleHttpRequest {
         switch (type){
             case TYPE_PARAMS:
                 if(TextUtils.isEmpty(contentType))
-                  conn.setRequestProperty("Content-Type", MEDIA_TYPE_FORM);
+                  conn.setRequestProperty("Content-Type", MediaType.MEDIA_TYPE_FORM);
                 String postStr = appendParams(params);
                 os=conn.getOutputStream();
                 os.write(postStr.getBytes("UTF-8"));
                 break;
             case TYPE_STRING:
                 if(TextUtils.isEmpty(contentType))
-                conn.setRequestProperty("Content-Type", MEDIA_TYPE_STRING);
+                conn.setRequestProperty("Content-Type", MediaType.MEDIA_TYPE_STRING);
                 os=conn.getOutputStream();
                 os.write(content.getBytes("UTF-8"));
                 break;
             case TYPE_BYTES:
                 if(TextUtils.isEmpty(contentType))
-                conn.setRequestProperty("Content-Type", MEDIA_TYPE_STREAM);
+                conn.setRequestProperty("Content-Type", MediaType.MEDIA_TYPE_STREAM);
                 os=conn.getOutputStream();
                 os.write(bytes);
                 break;
             case TYPE_FILE:
                 if(TextUtils.isEmpty(contentType))
-                conn.setRequestProperty("Content-Type", MEDIA_TYPE_STREAM);
+                conn.setRequestProperty("Content-Type", MediaType.MEDIA_TYPE_STREAM);
                 os=conn.getOutputStream();
                 os.write(getFileBytes(file));
                 break;

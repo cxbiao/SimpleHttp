@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,50 +13,73 @@
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="get"
-            android:text="get" />
+            android:onClick="getHttps"
+            android:text="getHttps"
+            android:textAllCaps="false"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="getPerson"
-            android:text="getPerson" />
+            android:onClick="findUserForGet"
+            android:text="findUserForGet"
+            android:textAllCaps="false"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="getCourse"
-            android:text="getCourse" />
+            android:onClick="findUserForPost"
+            android:text="findUserForPost"
+            android:textAllCaps="false"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="post"
-            android:text="post" />
+            android:onClick="findUserList"
+            android:text="findUserList"
+            android:textAllCaps="false"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:onClick="postJson"
-            android:text="postJson" />
+            android:onClick="postBodyJson"
+            android:text="postBodyJson"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="postBodyString"
+            android:text="postBodyString"
+            android:textAllCaps="false"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:onClick="download"
-            android:text="download" />
+            android:text="download"
+            android:textAllCaps="false"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:onClick="upload"
-            android:text="upload" />
+            android:text="upload"
+            android:textAllCaps="false"
+            />
 
         <TextView
             android:id="@+id/web"

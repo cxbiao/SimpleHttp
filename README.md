@@ -11,16 +11,7 @@
 compile 'com.bryan:simplehttp:1.0.0'
 ```
 
-###1.异步Get请求
-
-```
-new SimpleHttpRequest.Builder()
-                .url("https://kyfw.12306.cn/otn/")
-                .get(myCallBack);
-```
-
-
-###2.同步Get请求
+###1.同步Get请求
 
 ```
 String result=new SimpleHttpRequest.Builder()
@@ -28,15 +19,31 @@ String result=new SimpleHttpRequest.Builder()
                   .getSync(String.class);
 ```
 
+###2.异步Get请求
+
+```
+final List<FormParam> formParams=new ArrayList<>();
+        formParams.add(new FormParam("id","12"));
+        formParams.add(new FormParam("username","张明明"));
+        formParams.add(new FormParam("address","北京海淀区"));
+        
+ new SimpleHttpRequest.Builder()
+                .url(BASE_URL+"/rest/findUserForGet")
+                .params(formParams)
+                .get(userCallBack);
+```
+
+
+
+
 
 ###3 异步Post请求
 ```
-RequestCallback<List<Course>> model2CallBack=new RequestCallback<List<Course>>() {
+  RequestCallback<User> userCallBack=new RequestCallback<User>() {
         @Override
-        public void onSuccess(List<Course> response) {
-            for(Course c:response){
-                Log.d(TAG,c.toString());
-            }
+        public void onSuccess(User user) {
+            webContent.setText(Html.fromHtml(user.toString()));
+            Log.e(TAG,user.toString());
         }
 
         @Override
@@ -44,16 +51,15 @@ RequestCallback<List<Course>> model2CallBack=new RequestCallback<List<Course>>()
             webContent.setText(Html.fromHtml(e.getMessage()));
             Log.e(TAG, e.getMessage());
         }
+
     };
 
-List<FormParam> params = new ArrayList<>();
-params.add(new FormParam("username", "qq"));
-params.add(new FormParam("password", "说明"));
-params.put("format", "json");
-new SimpleHttpRequest.Builder()
-             .url("http://192.168.6.59:8080/web/ListServlet")
-             .params(params)
-             .post(model2CallBack);
+  new SimpleHttpRequest.Builder()
+                .url(BASE_URL+"/rest/findUserForPost")
+                .addParam("id","9")
+                .addParam("username","陈玄功")
+                .addParam("address","恶人谷")
+                .post(userCallBack);
 
 ```
 
@@ -61,41 +67,44 @@ new SimpleHttpRequest.Builder()
 ###4 Post请求json
 
 ```
- String json="{\"id\":2,\"name\":\"liky\"}";
- new SimpleHttpRequest.Builder()
-               .url("http://192.168.6.59:8080/web/LoginServlet")
-               .contentType(SimplePostHttpRequest.MEDIA_TYPE_JSON)
-               .content(json)
-               .post(model1CallBack);
+ String json="{\"id\":2,\"username\":\"李明\",\"birthday\":\"1995-09-06 09-09-08\",\"sex\":\"1\"}";
+         new SimpleHttpRequest.Builder()
+                 .url(BASE_URL+"/rest/postBodyJson")
+                 .contentType("application/json;charset=utf-8")
+                 .content(json)
+                 .post(userCallBack);
 
 ```
 
 ###5 下载（支持下载进度）
 
 ```
- new SimpleHttpRequest.Builder()
-                .url("http://192.168.6.59:8080/web/files/abc.apk")
-                .destFileDir(Environment.getExternalStorageDirectory()+"/okhttp")
-                .destFileName("abc中国.apk")
-                .download(myCallBack);
+ SimpleHttpRequest request=new SimpleHttpRequest.Builder()
+                //.url(BASE_URL+"/image/测试01.jpg")
+              // .url(BASE_URL+"/image/测试02.jpg")
+                .url(BASE_URL+"/image/girl.jpg")
+                .destFileDir(Environment.getExternalStorageDirectory().getAbsolutePath())
+                .destFileName(null)
+                .download(stringCallBack);
 ```
 
 ###6 文件上传（支持上传进度）
 
 ```
- List<FileParam> fileParams=new ArrayList<>();
- fileParams.add(new FileParam("file",null,new File(
-           Environment.getExternalStorageDirectory(),"qq中国.jpg")));
- fileParams.add(new FileParam("file",null,new File(
-           Environment.getExternalStorageDirectory(),"abc.jpg")));
- fileParams.add(new FileParam("file",null,new File(
-           Environment.getExternalStorageDirectory(),"hehe.doc")));
- new SimpleHttpRequest.Builder()
-            .url("http://192.168.6.59:8080/web/UploadFileServlet")
-            .addParam("filename", "music")
-            .addParam("filedes", "发如雪")
-            .files(fileParams)
-            .upload(myCallBack);
+  List<FileParam> fileParams=new ArrayList<>();
+  fileParams.add(new FileParam("file",null,new File(
+                Environment.getExternalStorageDirectory(),"测试01.jpg")));
+  fileParams.add(new FileParam("file",null,new File(
+                Environment.getExternalStorageDirectory(),"测试02.jpg")));
+  fileParams.add(new FileParam("file",null,new File(
+                Environment.getExternalStorageDirectory(),"girl.jpg")));
+        new SimpleHttpRequest.Builder()
+                .url(BASE_URL+"/rest/upload")
+                .addParam("id","5")
+                .addParam("username","刘冰")
+                .addParam("address","天津市")
+                .files(fileParams)
+                .upload(stringCallBack);
 ```
 
 ###7 添加header
@@ -110,7 +119,7 @@ new SimpleHttpRequest.Builder()
 ###8 自定义CallBack
 
 ```
- RequestCallback<String> myCallBack = new RequestCallback<String>() {
+ RequestCallback<String> stringCallBack = new RequestCallback<String>() {
         @Override
         public void onSuccess(String response) {
             webContent.setText(Html.fromHtml(response));

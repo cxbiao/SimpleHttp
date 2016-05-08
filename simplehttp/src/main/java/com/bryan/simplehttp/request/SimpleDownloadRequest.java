@@ -1,6 +1,8 @@
 package com.bryan.simplehttp.request;
 
 
+import android.text.TextUtils;
+
 import com.bryan.simplehttp.callback.RequestCallback;
 import com.bryan.simplehttp.callback.SimpleType;
 
@@ -24,9 +26,15 @@ public class SimpleDownloadRequest  extends  SimpleGetHttpRequest{
     @Override
     protected  <T>T execute(SimpleType<T> resultType) throws Exception {
         InputStream is = conn.getInputStream();
+        if(TextUtils.isEmpty(destFileDir)){
+            throw  new RuntimeException("destFileDir must not be null");
+        }
         File desFile=new File(destFileDir);
         if(!desFile.exists()){
             desFile.mkdirs();
+        }
+        if(TextUtils.isEmpty(destFileName)){
+            destFileName=new File(url).getName();
         }
         FileOutputStream fos=new FileOutputStream(new File(destFileDir,destFileName));
         long flength=conn.getContentLength();
